@@ -2,8 +2,8 @@
 
 angular.module('angular-http-cache', [])
 .service('$httpCache', 
-  ['$http', '$localDb', '$rootScope',
-  function($http, $localDb, $rootScope) {
+  ['$http', '$localDb', '$rootScope', '$q'
+  function($http, $localDb, $rootScope, $q) {
 
     var httpCache = function (options) {
       if (!(this instanceof httpCache)) {
@@ -16,102 +16,130 @@ angular.module('angular-http-cache', [])
       this.setDomain(options.domain);
     }
 
-    httpCache.prototype.get = function (id, callback, params) {
-      params = params || {};
-      this._catchExecute('get', {id:id});
+    httpCache.prototype.get = function (id, params) {
+      return $q(function (resolve, reject) {
 
-      var cached = $localDb.getIndex(this._getCacheKey(), id);
-      if (cached && !params.ignoreCache) {
-        callback(null, cached);
-      }
+	      params = params || {};
+	      this._catchExecute('get', {id:id});
 
-      $http({method: 'GET', url: '/' + this._getUrlPredicate() + '/' + id})
-        .success((function (data, status, headers, config) {
-          this._handleDoc(data.doc);
-          if (!cached || !this._caching || params.ignoreCache) {
-            callback(null, data.doc);
-          }
-          $rootScope.$broadcast(this._getCacheBroadcastPredicate() + '-cache-updated', {trigger: 'get', doc: data.doc});
-        }).bind(this))
-        .error(function (data, status, headers, config) {
-          callback(data.message);
-        });
+	      var cached = $localDb.getIndex(this._getCacheKey(), id);
+	      if (cached && !params.ignoreCache) {
+	      	resolve(cached);
+	      }
+
+	      $http({method: 'GET', url: '/' + this._getUrlPredicate() + '/' + id})
+	        .success((function (data, status, headers, config) {
+	          this._handleDoc(data.doc);
+	          if (!cached || !this._caching || params.ignoreCache) {
+	          	resolve(data.doc);
+	          }
+	          $rootScope.$broadcast(this._getCacheBroadcastPredicate() + '-cache-updated', {trigger: 'get', doc: data.doc});
+	        }).bind(this))
+	        .error(function (data, status, headers, config) {
+	        	reject(data.message);
+	        });
+
+      }).bind(this))
     }
 
-    httpCache.prototype.fetch = function (params, callback) {
-      this._catchExecute('fetch', {options:params});
-      var cached = $localDb.get(this._getCacheKey());
-      if (cached && !params.ignoreCache) {
-        if (!params.offset) {
-          callback(null, cached, {});
-        } else if (params.offset < cached.length) {
-          callback(null, cached, {});
-        }
-      }
-      $http({method: 'GET', url: '/' + this._getUrlPredicate(), params: params })
-        .success((function (data, status, headers, config) {
-          for (var i = 0; i < data.docs.length; i++) {
-            this._handleDoc(data.docs[i], params.index);
-          }
-          if (!this._caching || params.ignoreCache) {
-            callback(null, data.docs, data.data);
-          } else if (!cached) {
-            callback(null, $localDb.get(this._getCacheKey()), data.data);
-          }
-          $rootScope.$broadcast(this._getCacheBroadcastPredicate() + '-cache-updated', {trigger: 'fetch', docs: $localDb.get(this._getCacheKey()), index: params.index, data: data.data});
-        }).bind(this))
-        .error(function (data, status, headers, config) {
-          callback(data.message);
-        });
+    httpCache.prototype.fetch = function (params) {
+    	return $q(function (resolve, reject) {
+
+	      this._catchExecute('fetch', {options:params});
+
+	      var cached = $localDb.get(this._getCacheKey());
+	      if (cached && !params.ignoreCache) {
+	        if (!params.offset) {
+          	resolve({docs: cached, data: {}})
+	        } else if (params.offset < cached.length) {
+          	resolve({docs: cached, data: {}})
+	        }
+	      }
+
+	      $http({method: 'GET', url: '/' + this._getUrlPredicate(), params: params })
+	        .success((function (data, status, headers, config) {
+	          for (var i = 0; i < data.docs.length; i++) {
+	            this._handleDoc(data.docs[i], params.index);
+	          }
+	          if (!this._caching || params.ignoreCache) {
+	          	resolve({docs: data.docs, data: data.data})
+	          } else if (!cached) {
+	          	resolve({docs: $localDb.get(this._getCacheKey()), data: data.data})
+	          }
+	          $rootScope.$broadcast(this._getCacheBroadcastPredicate() + '-cache-updated', {trigger: 'fetch', docs: $localDb.get(this._getCacheKey()), index: params.index, data: data.data});
+	        }).bind(this))
+	        .error(function (data, status, headers, config) {
+	        	reject(data.message);
+	        });
+
+    	}).bind(this))
     }
 
     httpCache.prototype.create = function (data, callback) {
-      this._catchExecute('create', {data:data});
-      $http({method: 'POST', url: '/' + this._getUrlPredicate(), data: data})
-      .success((function (data, status, headers, config) {
-        this._handleDoc(data.doc);
-        (callback || angular.noop)(null, data.doc);
-      }).bind(this))
-      .error(function (data, status, headers, config) {
-        (callback || angular.noop)(data.message);
-      });
+    	return $q(function (resolve, reject) {
+
+	      this._catchExecute('create', {data:data});
+
+	      $http({method: 'POST', url: '/' + this._getUrlPredicate(), data: data})
+	      .success((function (data, status, headers, config) {
+	        this._handleDoc(data.doc);
+	        resolve(data.doc);
+	      }).bind(this))
+	      .error(function (data, status, headers, config) {
+	      	reject(data.message);
+	      });
+
+	    }).bind(this))
     }
 
     httpCache.prototype.update = function (doc, callback) {
-      delete doc.$$hashKey;
-      this._catchExecute('update', {doc:doc});
-      $http({method: 'PUT', url: '/' + this._getUrlPredicate(), data:{doc:doc}})
-        .success((function (data, status, headers, config) {
+    	return $q(function (resolve, reject) {
+	      delete doc.$$hashKey;
+	      this._catchExecute('update', {doc:doc});
+
+	      $http({method: 'PUT', url: '/' + this._getUrlPredicate(), data:{doc:doc}})
+	        .success((function (data, status, headers, config) {
             this._handleDoc(data.doc);
-            (callback || angular.noop)(null, data.doc);
-        }).bind(this))
-        .error(function (data, status, headers, config) {
-            (callback || angular.noop)(data.message);
-        });
+            resolve(data.doc);
+	        }).bind(this))
+	        .error(function (data, status, headers, config) {
+	        	reject(data.message);
+	        });
+    	}).bind(this))
     }
 
     httpCache.prototype.patch = function (id, prop, value, callback) {
-      this._catchExecute('patch', {id:id, prop:prop, value:value});
-      $http({method: 'PATCH', url: '/' + this._getUrlPredicate() + '/' + id, data:{prop:prop,value:value}})
-        .success((function (data, status, headers, config) {
+    	return $q(function (resolve, reject) {
+
+	      this._catchExecute('patch', {id:id, prop:prop, value:value});
+
+	      $http({method: 'PATCH', url: '/' + this._getUrlPredicate() + '/' + id, data:{prop:prop,value:value}})
+	        .success((function (data, status, headers, config) {
             this._handleDoc(data.doc);
-            (callback || angular.noop)(null, data.doc);
-        }).bind(this))
-        .error(function (data, status, headers, config) {
-            (callback || angular.noop)(data.message);
-        });
+            resolve(data.doc);
+	        }).bind(this))
+	        .error(function (data, status, headers, config) {
+	        	reject(data.message);
+	        });
+
+    	}).bind(this))
     }
 
     httpCache.prototype.delete = function (id, callback) {
-      this._catchExecute('delete', {id:id});
-      $http({method: 'DELETE', url: '/' + this._getUrlPredicate() + '/' + id})
-        .success((function (data, status, headers, config) {
+    	return $q(function (resolve, reject) {
+
+	      this._catchExecute('delete', {id:id});
+
+	      $http({method: 'DELETE', url: '/' + this._getUrlPredicate() + '/' + id})
+	        .success((function (data, status, headers, config) {
             this._handleDocRemoval(id);
-            (callback || angular.noop)(null, true);
-        }).bind(this))
-        .error(function (data, status, headers, config) {
-            (callback || angular.noop)(data.message);
-        });
+            resolve(true);
+	        }).bind(this))
+	        .error(function (data, status, headers, config) {
+	        	reject(data.message);
+	        });
+	        
+    	}).bind(this))
     }
 
     httpCache.prototype.initIndexes = function () {
