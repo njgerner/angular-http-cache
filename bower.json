@@ -1,0 +1,22 @@
+{
+  "name": "angular-http-cache",
+  "description": "An angular module that sits on top of $http and adds caching support and application wide notifications when cached data is updated.",
+  "main": "index.js",
+  "authors": [
+    "Nick Gerner <njgerner@gmail.com>"
+  ],
+  "license": "MIT",
+  "keywords": [
+    "angular",
+    "http",
+    "cache"
+  ],
+  "homepage": "",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
