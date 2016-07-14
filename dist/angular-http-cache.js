@@ -2,8 +2,8 @@
 
 angular.module('angular-http-cache', [])
 .service('$httpCache', 
-  ['$http', '$localDb', '$rootScope', '$q'
-  function($http, $localDb, $rootScope, $q) {
+  ['$http', '$localDb', '$rootScope', '$q',
+  function ($http, $localDb, $rootScope, $q) {
 
     var httpCache = function (options) {
       if (!(this instanceof httpCache)) {
@@ -17,7 +17,7 @@ angular.module('angular-http-cache', [])
     }
 
     httpCache.prototype.get = function (id, params) {
-      return $q(function (resolve, reject) {
+      return $q((function (resolve, reject) {
 
 	      params = params || {};
 	      this._catchExecute('get', {id:id});
@@ -43,7 +43,7 @@ angular.module('angular-http-cache', [])
     }
 
     httpCache.prototype.fetch = function (params) {
-    	return $q(function (resolve, reject) {
+    	return $q((function (resolve, reject) {
 
 	      this._catchExecute('fetch', {options:params});
 
@@ -76,7 +76,7 @@ angular.module('angular-http-cache', [])
     }
 
     httpCache.prototype.create = function (data, callback) {
-    	return $q(function (resolve, reject) {
+    	return $q((function (resolve, reject) {
 
 	      this._catchExecute('create', {data:data});
 
@@ -93,7 +93,7 @@ angular.module('angular-http-cache', [])
     }
 
     httpCache.prototype.update = function (doc, callback) {
-    	return $q(function (resolve, reject) {
+    	return $q((function (resolve, reject) {
 	      delete doc.$$hashKey;
 	      this._catchExecute('update', {doc:doc});
 
@@ -109,7 +109,7 @@ angular.module('angular-http-cache', [])
     }
 
     httpCache.prototype.patch = function (id, prop, value, callback) {
-    	return $q(function (resolve, reject) {
+    	return $q((function (resolve, reject) {
 
 	      this._catchExecute('patch', {id:id, prop:prop, value:value});
 
@@ -126,7 +126,7 @@ angular.module('angular-http-cache', [])
     }
 
     httpCache.prototype.delete = function (id, callback) {
-    	return $q(function (resolve, reject) {
+    	return $q((function (resolve, reject) {
 
 	      this._catchExecute('delete', {id:id});
 

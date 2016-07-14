@@ -1,12 +1,13 @@
 'use strict';
 
-describe('angular-local-db', () => {
+describe('angular-http-cache', () => {
 
   var $httpCache;
+  beforeEach(angular.mock.module('angular-local-db'));
   beforeEach(angular.mock.module('angular-http-cache'));
 
-  beforeEach(inject((_$httpCache) => {
-    $httpCache = _$httpCache;
+  beforeEach(inject((_$httpCache_) => {
+    $httpCache = _$httpCache_;
   }));
 
   it('should exist', () => {
@@ -15,17 +16,17 @@ describe('angular-local-db', () => {
 
   it('should initialize with a collection', () => {
     const service = $httpCache({collection: 'users'})
-    expect($httpCache.getCollection()).toEqual('users')
+    expect(service.getCollection()).toEqual('users')
   })
 
   it('should initialize with caching', () => {
     const service = $httpCache({caching: true})
-    expect($httpCache.getCaching()).toEqual(true)
+    expect(service.getDocCaching()).toEqual(true)
   })
 
   it('should initialize with a domain', () => {
     const service = $httpCache({domain: 'admin'})
-    expect($httpCache.getDomain()).toEqual('admin')
+    expect(service.getDomain()).toEqual('admin')
   })
 
   // TODO

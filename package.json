@@ -23,6 +23,7 @@
   "homepage": "https://github.com/njgerner/angular-http-cache#readme",
   "devDependencies": {
     "angular": "^1.5.7",
+    "angular-local-db": "^0.1.2",
     "angular-mocks": "^1.5.7",
     "angular-ui-router": "^0.3.1",
     "jasmine-core": "^2.4.1",
