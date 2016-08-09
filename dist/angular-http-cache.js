@@ -238,6 +238,9 @@ angular.module('angular-http-cache', ['angular-local-db'])
       return this._domain;
     }
 
+    /**
+    * @api private
+    */
     httpCache.prototype._init = function () {
       this.initIndexes();
       this._caching = true;
@@ -245,19 +248,30 @@ angular.module('angular-http-cache', ['angular-local-db'])
       this._domain = '';
     }
 
+    /**
+    * @api private
+    */
     httpCache.prototype._getUrlPredicate = function () {
       return this._domain ? this._domain + '/' + this._collection : this._collection;
     }
 
+    /**
+    * @api private
+    */
     httpCache.prototype._getCacheKey = function () {
       return this._domain ? this._domain + ':' + this._collection : this._collection;
     }
 
-
+    /**
+    * @api private
+    */
     httpCache.prototype._getCacheBroadcastPredicate = function () {
       return this._domain ? this._domain + '-' + this._collection : this._collection;
     }
 
+    /**
+    * @api private
+    */
     httpCache.prototype._handleDoc = function (doc, index, secondary) {
       if (!doc || !this._caching) return;
 
@@ -275,6 +289,9 @@ angular.module('angular-http-cache', ['angular-local-db'])
       }
     }
 
+    /**
+    * @api private
+    */
     httpCache.prototype._handleDocRemoval = function (id) {
       if (!id || !this._caching) return;
 
@@ -294,6 +311,9 @@ angular.module('angular-http-cache', ['angular-local-db'])
       }
     }
 
+    /**
+    * @api private
+    */
     httpCache.prototype._catchExecute = function (method, params) {
       if (!this._collection) { 
         throw new Error ('Set a collection in httpCache before using method: \'' + method + '\'');

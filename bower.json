@@ -1,6 +1,6 @@
 {
   "name": "angular-http-cache",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "An angular module that sits on top of $http and adds caching support and application wide notifications when cached data is updated.",
   "main": "index.js",
   "authors": [
