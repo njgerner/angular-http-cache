@@ -1,10 +1,18 @@
 'use strict';
 
-angular.module('angular-http-cache', [])
+angular.module('angular-http-cache', ['angular-local-db'])
 .service('$httpCache', 
   ['$http', '$localDb', '$rootScope', '$q',
   function ($http, $localDb, $rootScope, $q) {
 
+    /**
+    * @param {object} object
+    * @param {string} object.collection
+    * @param {boolean} object.caching
+    * @param {string} object.domain
+    * @return {httpCache}
+    * @api public
+    */
     var httpCache = function (options) {
       if (!(this instanceof httpCache)) {
         return new httpCache(options);
@@ -16,6 +24,13 @@ angular.module('angular-http-cache', [])
       this.setDomain(options.domain);
     }
 
+    /**
+    * @param {string|int} id
+    * @param {object} params
+    * @param {boolean} params.ignoreCache
+    * @return Promise
+    * @api public
+    */
     httpCache.prototype.get = function (id, params) {
       return $q((function (resolve, reject) {
 
@@ -42,6 +57,13 @@ angular.module('angular-http-cache', [])
       }).bind(this))
     }
 
+    /**
+    * @param {object} params
+    * @param {boolean} params.ignoreCache
+    * @param {string|int} params.index
+    * @return Promise
+    * @api public
+    */
     httpCache.prototype.fetch = function (params) {
     	return $q((function (resolve, reject) {
 
@@ -75,6 +97,11 @@ angular.module('angular-http-cache', [])
     	}).bind(this))
     }
 
+    /**
+    * @param {object} data
+    * @return Promise
+    * @api public
+    */
     httpCache.prototype.create = function (data, callback) {
     	return $q((function (resolve, reject) {
 
@@ -92,12 +119,17 @@ angular.module('angular-http-cache', [])
 	    }).bind(this))
     }
 
+    /**
+    * @param {object} doc
+    * @return Promise
+    * @api public
+    */
     httpCache.prototype.update = function (doc, callback) {
     	return $q((function (resolve, reject) {
 	      delete doc.$$hashKey;
 	      this._catchExecute('update', {doc:doc});
 
-	      $http({method: 'PUT', url: '/' + this._getUrlPredicate(), data:{doc:doc}})
+	      $http({method: 'PUT', url: '/' + this._getUrlPredicate() + '/' + doc.id, data:{doc:doc}})
 	        .success((function (data, status, headers, config) {
             this._handleDoc(data.doc);
             resolve(data.doc);
@@ -108,6 +140,13 @@ angular.module('angular-http-cache', [])
     	}).bind(this))
     }
 
+    /**
+    * @param {string|int} id
+    * @param {string|int} prop
+    * @param {string|int|array|object} value
+    * @return Promise
+    * @api public
+    */
     httpCache.prototype.patch = function (id, prop, value, callback) {
     	return $q((function (resolve, reject) {
 
@@ -125,6 +164,11 @@ angular.module('angular-http-cache', [])
     	}).bind(this))
     }
 
+    /**
+    * @param {string|int} id
+    * @return Promise
+    * @api public
+    */
     httpCache.prototype.delete = function (id, callback) {
     	return $q((function (resolve, reject) {
 
@@ -142,30 +186,54 @@ angular.module('angular-http-cache', [])
     	}).bind(this))
     }
 
+    /**
+    * @api public
+    */
     httpCache.prototype.initIndexes = function () {
       this._indexMap = {};
     }
 
+    /**
+    * @param {string} collection
+    * @api public
+    */
     httpCache.prototype.setCollection = function (collection) {
       this._collection = collection;
     }
 
+    /**
+    * @api public
+    */
     httpCache.prototype.getCollection = function () {
       return this._collection;
     }
 
+    /**
+    * @param {boolean} caching
+    * @api public
+    */
     httpCache.prototype.setDocCaching = function (caching) {
       this._caching = caching;
     }
 
+    /**
+    * @api public
+    */
     httpCache.prototype.getDocCaching = function () {
       return this._caching;
     }
 
+    /**
+    * @param {string} domain
+    * @api public
+    */
     httpCache.prototype.setDomain = function (domain) {
       this._domain = domain;
     }
 
+    /**
+    * @api public
+    */
     httpCache.prototype.getDomain = function () {
       return this._domain;
     }
