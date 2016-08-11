@@ -6,7 +6,7 @@ angular.module('angular-http-cache', ['angular-local-db'])
   function ($http, $localDb, $rootScope, $q) {
 
     /**
-    * @param {object} object
+    * @param {Object} object
     * @param {string} object.collection
     * @param {boolean} object.caching
     * @param {string} object.domain
@@ -22,7 +22,7 @@ angular.module('angular-http-cache', ['angular-local-db'])
       this.setCollection(options.collection);
       this.setDocCaching(options.caching);
       this.setDomain(options.domain);
-    }
+    };
 
     /**
     * @param {string|int} id
@@ -55,7 +55,7 @@ angular.module('angular-http-cache', ['angular-local-db'])
 	        });
 
       }).bind(this))
-    }
+    };
 
     /**
     * @param {object} params
@@ -95,14 +95,14 @@ angular.module('angular-http-cache', ['angular-local-db'])
 	        });
 
     	}).bind(this))
-    }
+    };
 
     /**
     * @param {object} data
     * @return Promise
     * @api public
     */
-    httpCache.prototype.create = function (data, callback) {
+    httpCache.prototype.create = function (data) {
     	return $q((function (resolve, reject) {
 
 	      this._catchExecute('create', {data:data});
@@ -117,14 +117,14 @@ angular.module('angular-http-cache', ['angular-local-db'])
 	      });
 
 	    }).bind(this))
-    }
+    };
 
     /**
     * @param {object} doc
     * @return Promise
     * @api public
     */
-    httpCache.prototype.update = function (doc, callback) {
+    httpCache.prototype.update = function (doc) {
     	return $q((function (resolve, reject) {
 	      delete doc.$$hashKey;
 	      this._catchExecute('update', {doc:doc});
@@ -138,7 +138,7 @@ angular.module('angular-http-cache', ['angular-local-db'])
 	        	reject(data.message);
 	        });
     	}).bind(this))
-    }
+    };
 
     /**
     * @param {string|int} id
@@ -147,7 +147,7 @@ angular.module('angular-http-cache', ['angular-local-db'])
     * @return Promise
     * @api public
     */
-    httpCache.prototype.patch = function (id, prop, value, callback) {
+    httpCache.prototype.patch = function (id, prop, value) {
     	return $q((function (resolve, reject) {
 
 	      this._catchExecute('patch', {id:id, prop:prop, value:value});
@@ -162,14 +162,14 @@ angular.module('angular-http-cache', ['angular-local-db'])
 	        });
 
     	}).bind(this))
-    }
+    };
 
     /**
     * @param {string|int} id
     * @return Promise
     * @api public
     */
-    httpCache.prototype.delete = function (id, callback) {
+    httpCache.prototype.delete = function (id) {
     	return $q((function (resolve, reject) {
 
 	      this._catchExecute('delete', {id:id});
@@ -184,14 +184,14 @@ angular.module('angular-http-cache', ['angular-local-db'])
 	        });
 	        
     	}).bind(this))
-    }
+    };
 
     /**
     * @api public
     */
     httpCache.prototype.initIndexes = function () {
       this._indexMap = {};
-    }
+    };
 
     /**
     * @param {string} collection
@@ -199,14 +199,14 @@ angular.module('angular-http-cache', ['angular-local-db'])
     */
     httpCache.prototype.setCollection = function (collection) {
       this._collection = collection;
-    }
+    };
 
     /**
     * @api public
     */
     httpCache.prototype.getCollection = function () {
       return this._collection;
-    }
+    };
 
     /**
     * @param {boolean} caching
@@ -214,14 +214,14 @@ angular.module('angular-http-cache', ['angular-local-db'])
     */
     httpCache.prototype.setDocCaching = function (caching) {
       this._caching = caching;
-    }
+    };
 
     /**
     * @api public
     */
     httpCache.prototype.getDocCaching = function () {
       return this._caching;
-    }
+    };
 
     /**
     * @param {string} domain
@@ -229,14 +229,14 @@ angular.module('angular-http-cache', ['angular-local-db'])
     */
     httpCache.prototype.setDomain = function (domain) {
       this._domain = domain;
-    }
+    };
 
     /**
     * @api public
     */
     httpCache.prototype.getDomain = function () {
       return this._domain;
-    }
+    };
 
     /**
     * @api private
@@ -246,28 +246,28 @@ angular.module('angular-http-cache', ['angular-local-db'])
       this._caching = true;
       this._collection = '';
       this._domain = '';
-    }
+    };
 
     /**
     * @api private
     */
     httpCache.prototype._getUrlPredicate = function () {
       return this._domain ? this._domain + '/' + this._collection : this._collection;
-    }
+    };
 
     /**
     * @api private
     */
     httpCache.prototype._getCacheKey = function () {
       return this._domain ? this._domain + ':' + this._collection : this._collection;
-    }
+    };
 
     /**
     * @api private
     */
     httpCache.prototype._getCacheBroadcastPredicate = function () {
       return this._domain ? this._domain + '-' + this._collection : this._collection;
-    }
+    };
 
     /**
     * @api private
@@ -278,16 +278,15 @@ angular.module('angular-http-cache', ['angular-local-db'])
       $localDb.setIndex(this._getCacheKey(), doc.id, doc);
       $localDb.addToSet(this._getCacheKey(), doc);
 
-      if (index) {
+      if (secondary) {
+        if (this._indexMap[index].indexOf(secondary) == -1) { this._indexMap[index].push(secondary); }
+        $localDb.addToSecondaryIndexSet(this._getCacheKey(), index, secondary, doc);
+      } else if (index) {
         this._indexMap[index] = this._indexMap[index] || [];
         $localDb.addToIndexSet(this._getCacheKey(), index, doc);
       }
 
-      if (secondary) {
-        if (this._indexMap[index].indexOf(secondary) == -1) { this._indexMap[index].push(secondary); }
-        $localDb.addToSecondaryIndexSet(this._getCacheKey(), index, secondary, doc);
-      }
-    }
+    };
 
     /**
     * @api private
@@ -309,7 +308,7 @@ angular.module('angular-http-cache', ['angular-local-db'])
           }
         }
       }
-    }
+    };
 
     /**
     * @api private
@@ -358,9 +357,8 @@ angular.module('angular-http-cache', ['angular-local-db'])
           break;
       }
 
-    }
+    };
 
     return httpCache;
-
-
-}])
+      
+}]);
