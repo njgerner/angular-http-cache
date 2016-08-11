@@ -38,9 +38,7 @@ angular.module('angular-http-cache', ['angular-local-db'])
 	      this._catchExecute('get', {id:id});
 
 	      var cached = $localDb.getIndex(this._getCacheKey(), id);
-	      if (cached && !params.ignoreCache) {
-	      	resolve(cached);
-	      }
+	      if (cached && !params.ignoreCache) { resolve(cached);}
 
 	      $http({method: 'GET', url: '/' + this._getUrlPredicate() + '/' + id})
 	        .success((function (data, status, headers, config) {
@@ -278,7 +276,7 @@ angular.module('angular-http-cache', ['angular-local-db'])
       $localDb.setIndex(this._getCacheKey(), doc.id, doc);
       $localDb.addToSet(this._getCacheKey(), doc);
 
-      if (secondary) {
+      if (secondary && index) {
         if (this._indexMap[index].indexOf(secondary) == -1) { this._indexMap[index].push(secondary); }
         $localDb.addToSecondaryIndexSet(this._getCacheKey(), index, secondary, doc);
       } else if (index) {
@@ -360,5 +358,5 @@ angular.module('angular-http-cache', ['angular-local-db'])
     };
 
     return httpCache;
-      
+
 }]);
