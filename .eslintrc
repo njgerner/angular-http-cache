@@ -1,0 +1,23 @@
+{
+  "parser": "babel-eslint",
+  "sourceType": "script",
+  "parserOptions": {
+    "ecmaVersion": 6
+  },
+  "env": {
+    "node": true,
+    "es6": true
+  },
+  "rules": {
+    "arrow-body-style": 0,
+    "no-param-reassign": 0,
+    "func-names": 0,
+    "indent": ["error", 4],
+    "max-len": 0,
+    "comma-dangle": 0,
+    "no-unused-vars": 1,
+    "padded-blocks": 0,
+    "no-underscore-dangle": 0,
+    "global-require": 0
+  }
+}

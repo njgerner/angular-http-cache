@@ -1,0 +1,6 @@
+{
+  "sourceType": "script",
+  "env": {
+    "node": true
+  }
+}
