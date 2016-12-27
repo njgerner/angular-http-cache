@@ -232,6 +232,7 @@ angular.module('angular-http-cache', ['angular-local-db']).service('$httpCache',
      */
     httpCache.prototype.setCollection = function (collection) {
         this._collection = collection;
+        return this;
     };
 
     /**
@@ -262,6 +263,7 @@ angular.module('angular-http-cache', ['angular-local-db']).service('$httpCache',
      */
     httpCache.prototype.setDomain = function (domain) {
         this._domain = domain;
+        return this;
     };
 
     /**
