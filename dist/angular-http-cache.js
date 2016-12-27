@@ -248,6 +248,7 @@ angular.module('angular-http-cache', ['angular-local-db']).service('$httpCache',
      */
     httpCache.prototype.setDocCaching = function (caching) {
         this._caching = caching;
+        return this;
     };
 
     /**
