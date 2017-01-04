@@ -296,6 +296,10 @@ angular.module('angular-http-cache', ['angular-local-db'])
                 this._domain = '';
             };
 
+
+
+
+
             /**
              * @api private
              */
