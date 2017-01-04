@@ -244,6 +244,7 @@ angular.module('angular-http-cache', ['angular-local-db'])
              */
             httpCache.prototype.setCollection = function (collection) {
                 this._collection = collection;
+                return this;
             };
 
             /**
@@ -251,6 +252,7 @@ angular.module('angular-http-cache', ['angular-local-db'])
              */
             httpCache.prototype.getCollection = function () {
                 return this._collection;
+                return this;
             };
 
             /**
@@ -259,6 +261,7 @@ angular.module('angular-http-cache', ['angular-local-db'])
              */
             httpCache.prototype.setDocCaching = function (caching) {
                 this._caching = caching;
+                return this;
             };
 
             /**
