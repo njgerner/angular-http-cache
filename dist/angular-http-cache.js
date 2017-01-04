@@ -277,6 +277,7 @@ angular.module('angular-http-cache', ['angular-local-db'])
       $localDb.addToSet(this._getCacheKey(), doc);
 
       if (secondary && index) {
+        this._indexMap[index] = this._indexMap[index] || [];
         if (this._indexMap[index].indexOf(secondary) == -1) { this._indexMap[index].push(secondary); }
         $localDb.addToSecondaryIndexSet(this._getCacheKey(), index, secondary, doc);
       } else if (index) {
